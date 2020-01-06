@@ -1,6 +1,6 @@
 module day2
 
-using ..advent.Intcode
+using ..Intcode
 using Base.Iterators: product
 
 const day2tape = parse.(Int, split(readline(joinpath(@__DIR__, "input.txt")), ","))
