@@ -74,7 +74,8 @@ end
     @test password_checkerB("112233")
     @test !password_checkerB("123444")
     @test password_checkerB("111122")
+    @test password_checkerB("123455")
 
     @test advent.day4.A() == 1063
-    @test advent.day4.B() == 5750
+    @test advent.day4.B() == 686
 end

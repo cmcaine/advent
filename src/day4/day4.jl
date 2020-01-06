@@ -30,7 +30,10 @@ function password_checker(pass)
     return length(pass) == 6 && ascending(pass) && doubled(pass)
 end
 
+
 """
+    password_checkerB(pass)
+
 An Elf just remembered one more important detail: the two adjacent matching digits are not part of a larger group of matching digits.
 
 Given this additional criterion, but still ignoring the range rule, the following are now true:
@@ -38,15 +41,16 @@ Given this additional criterion, but still ignoring the range rule, the followin
     112233 meets these criteria because the digits never decrease and all repeated digits are exactly two digits long.
     123444 no longer meets the criteria (the repeated 44 is part of a larger group of 444).
     111122 meets the criteria (even though 1 is repeated more than twice, it still contains a double 22).
-"""
 
+"""
 function password_checkerB(pass)
     exactly_doubled(str) =
         any(a != b && b == c && c != d for (a, b, c, d) in
-            zip(str, str[2:end], str[3:end] * " ", str[4:end] * "  "))
+            zip(" " * str, str, str[2:end], str[3:end] * " "))
     ascending(str) = all(a <= b for (a, b) in zip(str, str[2:end]))
     return length(pass) == 6 && ascending(pass) && exactly_doubled(pass)
 end
+
 
 A() = count(password_checker ∘ string, input)
 B() = count(password_checkerB ∘ string, input)
