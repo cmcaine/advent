@@ -18,6 +18,48 @@ end
     @test interpret_intcode([1,1,1,4,99,5,6,0,99]) == [30,1,1,4,2,5,6,0,99]
     @test interpret_intcode([1,9,10,3,2,3,11,0,99,30,40,50]) ==
         [3500,9,10,70,2,3,11,0,99,30,40,50]
+
+
+    # day 5
+
+    @testset "IO" begin
+        @test interpret_intcode!([4, 0, 99], []) == ([4, 0, 99], [4])
+        @test interpret_intcode!([3, 1, 99], [5]) == ([3, 5, 99], [])
+    end
+
+    @testset "parameter modes" begin
+        @test interpret_intcode!([01101, 3, 3, 0, 99]) == [6, 3, 3, 0, 99]
+        @test interpret_intcode!([00101, 3, 0, 0, 99]) == [104, 3, 0, 0, 99]
+        # Ignore parameter mode on destination parameter
+        @test interpret_intcode!([11101, 3, 3, 0, 99]) == [6, 3, 3, 0, 99]
+    end
+
+    @testset "comparisons" begin
+        # Test if input is 8
+        @test interpret_intcode([3,3,1108,-1,8,3,4,3,99], [8])[2] == [1]
+        @test interpret_intcode([3,3,1108,-1,8,3,4,3,99], [7])[2] == [0]
+        # Test if input is < 8
+        @test interpret_intcode([3,9,7,9,10,9,4,9,99,-1,8], [7])[2] == [1]
+        @test interpret_intcode([3,9,7,9,10,9,4,9,99,-1,8], [8])[2] == [0]
+        @test interpret_intcode([3,9,7,9,10,9,4,9,99,-1,8], [9])[2] == [0]
+        @test interpret_intcode([3,3,1107,-1,8,3,4,3,99], [9])[2] == [0]
+    end
+
+    @testset "jumps" begin
+        # output 0 if input is 0, else 1
+        @test interpret_intcode([3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9], [0])[2] == [0]
+        @test interpret_intcode([3,3,1105,-1,9,1101,0,0,12,4,12,99,1], [0])[2] == [0]
+    end
+
+    @testset "day5 test program" begin
+        testProg = readtape(joinpath(@__DIR__, "../src/day5/input.txt"))
+        @test all(interpret_intcode(testProg, [1])[2][1:end-1] .== 0)
+        @test interpret_intcode(
+            [3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
+             1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
+             999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99],
+            [7])[2] == [999]
+    end
 end
 
 
@@ -78,4 +120,9 @@ end
 
     @test advent.day4.A() == 1063
     @test advent.day4.B() == 686
+end
+
+@testset "day5" begin
+    @test advent.day5.A() == 13978427
+    @test advent.day5.B() == 11189491
 end
