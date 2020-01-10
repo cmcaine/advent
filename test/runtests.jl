@@ -52,7 +52,7 @@ end
     end
 
     @testset "day5 test program" begin
-        testProg = readtape(joinpath(@__DIR__, "../src/day5/input.txt"))
+        testProg = Intcode.readtape(joinpath(@__DIR__, "../src/day5/input.txt"))
         @test all(interpret_intcode(testProg, [1])[2][1:end-1] .== 0)
         @test interpret_intcode(
             [3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
