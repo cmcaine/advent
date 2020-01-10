@@ -128,7 +128,6 @@ end
 end
 
 @testset "day6" begin
-
     @test advent.day6.count_orbits("""COM)B
     B)C
     C)D
@@ -154,4 +153,5 @@ end
     J)K
     K)L""") == 42
 
+    @test advent.day6.A() == 142915
 end

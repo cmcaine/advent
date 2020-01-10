@@ -1,5 +1,8 @@
 module day6
 
+using Base.Iterators: flatten
+using LightGraphs: SimpleDiGraph, add_edge!, gdistances
+
 """
     count_orbits(sys)
 
@@ -12,13 +15,9 @@ COM -> A -> B -> C
 For each entity, the number of orbits == path length to COM.
 
 """
-function count_orbits(sys)
-    sum(values(sys))
-end
+count_orbits(sys) = sum(gdistances(sys, 1))
 
-function count_orbits(sys::AbstractString)
-    count_orbits(read_orbits(sys))
-end
+count_orbits(sys::AbstractString) = count_orbits(read_orbits(sys))
 
 
 """
@@ -41,13 +40,14 @@ Things wot we could do:
 """
 function read_orbits(str)
     orbits = split.(split(str, '\n'), ')')
-    num_orbits = Dict("COM" => 0)
+    key = Dict(k => i for (i, k) in enumerate(unique(["COM", flatten(orbits)...])))
+    g = SimpleDiGraph(length(key))
     for (principal, satellite) in orbits
-        num_orbits[satellite] = num_orbits[principal] + 1
+        add_edge!(g, key[principal], key[satellite])
     end
-    return num_orbits
+    return g
 end
 
-A() = count_orbits(read_orbits(String(read(joinpath(@__DIR__, "input.txt")))))
+A() = count_orbits(read_orbits(strip(String(read(joinpath(@__DIR__, "input.txt"))))))
 
 end
