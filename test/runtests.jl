@@ -52,7 +52,7 @@ end
     end
 
     @testset "day5 test program" begin
-        testProg = Intcode.readtape(joinpath(@__DIR__, "../src/day5/input.txt"))
+        testProg = readtape(joinpath(@__DIR__, "../src/day5/input.txt"))
         @test all(interpret_intcode(testProg, [1])[2][1:end-1] .== 0)
         @test interpret_intcode(
             [3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
@@ -170,4 +170,17 @@ end
     I)SAN""") == 4
 
     @test advent.day6.B() == 283
+end
+
+@testset "day7" begin
+    @test advent.day7.maximum_output([3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0]) ==
+        (43210, [4,3,2,1,0])
+    @test advent.day7.maximum_output([3,23,3,24,1002,24,10,24,1002,23,-1,23,101,5,23,
+                                      23,1,24,23,23,4,23,99,0,0]) ==
+        (54321, [0:4...])
+    @test advent.day7.maximum_output([3,31,3,32,1002,32,10,32,1001,31,-2,31,1007,31,0,33,
+                                      1002,33,7,33,1,33,31,31,1,32,31,31,4,31,99,0,0,0]) ==
+        (65210, [1,0,4,3,2])
+
+    @test advent.day7.A() == (34852, [1,3,2,4,0])
 end

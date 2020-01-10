@@ -3,7 +3,7 @@ module Intcode
 using Base.Iterators: product
 using OffsetArrays: OffsetVector
 
-export interpret_intcode!, interpret_intcode
+export interpret_intcode!, interpret_intcode, readtape
 
 
 """
