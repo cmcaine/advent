@@ -154,4 +154,20 @@ end
     K)L""") == 42
 
     @test advent.day6.A() == 142915
+
+    @test advent.day6.transfers_to_santa("""COM)B
+    B)C
+    C)D
+    D)E
+    E)F
+    B)G
+    G)H
+    D)I
+    E)J
+    J)K
+    K)L
+    K)YOU
+    I)SAN""") == 4
+
+    @test advent.day6.B() == 283
 end
