@@ -126,3 +126,32 @@ end
     @test advent.day5.A() == 13978427
     @test advent.day5.B() == 11189491
 end
+
+@testset "day6" begin
+
+    @test advent.day6.count_orbits("""COM)B
+    B)C
+    C)D
+    D)E
+    E)F
+    B)G
+    G)H
+    D)I
+    E)J
+    J)K
+    K)L""") == 42
+
+    # Re-orderings permitted
+    @test advent.day6.count_orbits("""COM)B
+    C)D
+    B)C
+    D)E
+    E)F
+    B)G
+    G)H
+    D)I
+    E)J
+    J)K
+    K)L""") == 42
+
+end
