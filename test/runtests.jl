@@ -197,3 +197,8 @@ end
 
     @test advent.day7.B() == (44282086, [6, 9, 5, 8, 7])
 end
+
+@testset "day8" begin
+    @test advent.day8.A() == 1560
+    @test advent.day8.decode(parse.(Int, split("0222112222120000", "")), 2, 2) == [0 1; 1 0]
+end
