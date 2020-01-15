@@ -1,7 +1,8 @@
 module Intcode
 
 using Base.Iterators: product
-using OffsetArrays: OffsetVector
+
+import Base: ==
 
 export interpret_intcode!, interpret_intcode, readtape
 
@@ -70,6 +71,40 @@ end
 
 
 """
+    Tape{T}
+
+A sparse vector of infinite size. Only non-zeros stored. Indexes are zero-based.
+
+"""
+struct Tape{T}
+    initial::AbstractVector{T}
+    additional::AbstractDict{T,T}
+end
+
+Tape(initial::AbstractVector{T}) where T = Tape(initial, Dict{T, T}())
+
+Base.getindex(tape::Tape{T}, idx) where T =
+    idx < length(tape.initial) ?
+    tape.initial[idx+1] :
+    haskey(tape.additional, idx) ?
+    tape.additional[idx] :
+    zero(T)
+
+Base.setindex!(tape::Tape, value, idx) =
+    idx < length(tape.initial) ?
+        tape.initial[idx+1] = value :
+        tape.additional[idx] = value
+
+Base.eachindex(tape::Tape) =
+    ((eachindex(tape.initial) .- 1)..., eachindex(tape.additional)...)
+
+(==)(a::Tape, b::Tape) =
+    eachindex(a) == eachindex(b) && all(a[i] == b[i] for i in eachindex(a))
+(==)(a::Tape, v::AbstractVector) = a == Tape(v)
+(==)(a::AbstractVector, b::Tape) = b == a
+
+
+"""
     interpret_intcode!(tape, input=() -> parse(Int, readline()), output=println)
 
 Run the intcode machine on tape, possibly modifying it. If input or output or required, call the provided functions.
@@ -81,19 +116,26 @@ output: Int -> Nothing
 
 """
 function interpret_intcode!(tape, input=() -> parse(Int, readline()), output=println)
-    tape = OffsetVector(tape, 0:length(tape)-1)
+    tape = Tape(tape)
 
     # d for dereference
     d(x) = tape[tape[x]]
     d(x, y) = tape[tape[x]] = y
 
     PC = 0
+    relative_base = 0
     while true
         op, modes = op_parse(tape[PC])
 
         # OPTIM: this could be really expensive if the compiler is not smart
         "value of parameter x"
-        param(x) = modes[x] == 1 ? tape[PC+x] : d(PC+x)
+        param(x) = if modes[x] == 1
+            tape[PC+x]
+        elseif modes[x] == 2
+            tape[tape[PC+x] + relative_base]
+        else
+            d(PC+x)
+        end
 
         if op == 1
             d(PC+3, param(1) + param(2))
@@ -117,8 +159,11 @@ function interpret_intcode!(tape, input=() -> parse(Int, readline()), output=pri
         elseif op == 8
             d(PC+3, param(1) == param(2) ? 1 : 0)
             PC += 4
+        elseif op == 9
+            relative_base = param(1)
+            PC += 2
         elseif op == 99
-            return parent(tape)
+            return tape
         else
             throw(DomainError("Unfestive opcode $op"))
         end

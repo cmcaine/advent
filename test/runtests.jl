@@ -23,15 +23,15 @@ end
     # day 5
 
     @testset "IO" begin
-        @test interpret_intcode!([4, 0, 99], []) == ([4, 0, 99], [4])
-        @test interpret_intcode!([3, 1, 99], [5]) == ([3, 5, 99], [])
+        @test interpret_intcode([4, 0, 99], []) == ([4, 0, 99], [4])
+        @test interpret_intcode([3, 1, 99], [5]) == ([3, 5, 99], [])
     end
 
     @testset "parameter modes" begin
-        @test interpret_intcode!([01101, 3, 3, 0, 99]) == [6, 3, 3, 0, 99]
-        @test interpret_intcode!([00101, 3, 0, 0, 99]) == [104, 3, 0, 0, 99]
+        @test interpret_intcode([01101, 3, 3, 0, 99]) == [6, 3, 3, 0, 99]
+        @test interpret_intcode([00101, 3, 0, 0, 99]) == [104, 3, 0, 0, 99]
         # Ignore parameter mode on destination parameter
-        @test interpret_intcode!([11101, 3, 3, 0, 99]) == [6, 3, 3, 0, 99]
+        @test interpret_intcode([11101, 3, 3, 0, 99]) == [6, 3, 3, 0, 99]
     end
 
     @testset "comparisons" begin
@@ -59,6 +59,27 @@ end
              1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
              999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99],
             [7])[2] == [999]
+    end
+
+    @testset "relative base" begin
+        @test interpret_intcode([9, 1, 204, 0, 99], [])[2] == [1]
+    end
+
+    @testset "infinite memory" begin
+        @test interpret_intcode([1, 0, 0, 100, 4, 100, 99], [])[2] == [2]
+        @test interpret_intcode([1101, 99, 0, 4]) == [1101,99,0,4,99]
+    end
+
+    @testset "day9" begin
+        quine = [109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]
+        #= 109 1 -> rb=1 =#
+        #= 204 -1 -> out(0) =#
+        #= 1001 100 1 100 -> Tape[100] = add(0, 1) =#
+
+        interpret_intcode(quine, [])
+        @test interpret_intcode([1102,34915192,34915192,7,4,7,99,0], [])[2] ==
+            [1219070632396864]
+        @test interpret_intcode([104,1125899906842624,99], [])[2] == [1125899906842624]
     end
 end
 
