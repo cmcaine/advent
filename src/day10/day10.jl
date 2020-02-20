@@ -6,7 +6,7 @@ using Test
 function parse_map(map)
     x = 0
     y = 0
-    asteroids = []
+    asteroids = Vector{Tuple{Int, Int}}()
     for c in map
         if c == '\n'
             y += 1
