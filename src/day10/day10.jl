@@ -171,8 +171,6 @@ function lucky_bet(station, asteroids, n = 200)
             asteroids = setdiff(asteroids, map(closest, unique(angles)))
         end
     end
-    # Count unique. If acc < 200,
-    sortperm(angles, lt=lessthan_angle)
 end
 
 
